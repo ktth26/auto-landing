@@ -4,18 +4,27 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Сколько ты переплачиваешь на авто? — узнай за 60 секунд</title>
+
+<!-- Шрифты -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-  /* ============ БАЗОВЫЕ СТИЛИ ============ */
+  /* ============================================================
+     ТЕМА «ГАРАЖ» — тёмный фон, металл, дорожные акценты
+     ============================================================ */
   :root {
-    --accent: #ff5a1f;
-    --accent-dark: #e04a13;
-    --bg: #ffffff;
-    --bg-soft: #f7f8fa;
-    --text: #14171f;
-    --text-muted: #5b6472;
-    --border: #e6e8ee;
+    --bg: #0f1115;              /* основной тёмный */
+    --bg-2: #171a21;            /* чуть светлее для карточек */
+    --bg-3: #1e222b;            /* ещё светлее для hover */
+    --line: #2a2f3a;            /* границы */
+    --text: #f1f3f7;            /* основной текст */
+    --muted: #8b93a3;           /* приглушённый текст */
+    --accent: #ff7a1a;          /* дорожный оранжевый */
+    --accent-2: #ffd400;        /* сигнальный жёлтый */
+    --accent-glow: rgba(255, 122, 26, 0.35);
     --radius: 16px;
-    --shadow: 0 8px 24px rgba(20, 23, 31, 0.06);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,261 +32,476 @@
   html { scroll-behavior: smooth; }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
     color: var(--text);
-    line-height: 1.5;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+
+    /* Тонкая текстура «бетон» через повторяющийся градиент */
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,122,26,0.05), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(255,212,0,0.03), transparent 40%);
+    background-attachment: fixed;
   }
 
-  .container {
-    max-width: 1080px;
-    margin: 0 auto;
-    padding: 0 20px;
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 80px 0; position: relative; }
+
+  h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; font-weight: 800; }
+  h1 { font-size: clamp(30px, 5.5vw, 56px); }
+  h2 { font-size: clamp(26px, 4vw, 40px); margin-bottom: 40px; }
+  h3 { font-size: 18px; margin-bottom: 8px; }
+  p { color: var(--muted); }
+
+  /* Жёлто-чёрная предупреждающая полоса (разделитель секций) */
+  .stripe {
+    height: 8px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--accent-2) 0 20px,
+      #0f1115 20px 40px
+    );
+    opacity: 0.85;
   }
 
-  section { padding: 64px 0; }
-
-  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; }
-
-  h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; }
-  h2 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin-bottom: 32px; }
-  h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-
-  p { color: var(--text-muted); }
-
-  /* ============ КНОПКИ ============ */
+  /* ============================================================
+     КНОПКИ
+     ============================================================ */
   .btn {
     display: inline-block;
     background: var(--accent);
-    color: #fff;
+    color: #0f1115;
     padding: 16px 32px;
     border: none;
     border-radius: 999px;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 800;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
     text-decoration: none;
     font-family: inherit;
+    letter-spacing: -0.01em;
+    box-shadow: 0 8px 24px var(--accent-glow);
   }
-  .btn:hover { background: var(--accent-dark); }
-  .btn:active { transform: scale(0.98); }
-  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn:hover {
+    background: #ff8c38;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 32px var(--accent-glow);
+  }
+  .btn:active { transform: translateY(0) scale(0.99); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
   .btn-ghost {
     background: transparent;
-    color: var(--text-muted);
-    border: 1px solid var(--border);
+    color: var(--muted);
+    border: 1.5px solid var(--line);
+    box-shadow: none;
   }
-  .btn-ghost:hover { background: var(--bg-soft); color: var(--text); }
+  .btn-ghost:hover { background: var(--bg-2); color: var(--text); }
 
-  /* ============ HERO ============ */
+  /* ============================================================
+     HERO — гаражная атмосфера
+     ============================================================ */
   .hero {
-    background: linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
-    padding: 80px 0 64px;
+    position: relative;
+    padding: 100px 0 120px;
     text-align: center;
+    overflow: hidden;
   }
-  .hero p.sub {
-    font-size: clamp(16px, 2.2vw, 20px);
-    max-width: 640px;
-    margin: 20px auto 32px;
+  /* Фоновая картинка гаража с затемнением */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('hero.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.35;
+    filter: brightness(0.5) contrast(1.1);
+    z-index: -2;
   }
+  /* Виньетка + затемнение, чтобы текст читался */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 0%, rgba(15,17,21,0.85) 70%),
+      linear-gradient(180deg, rgba(15,17,21,0.6) 0%, rgba(15,17,21,0.95) 100%);
+    z-index: -1;
+  }
+
   .hero .badge {
-    display: inline-block;
-    background: #fff1eb;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,122,26,0.12);
+    border: 1px solid rgba(255,122,26,0.3);
     color: var(--accent);
     font-size: 13px;
     font-weight: 700;
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 999px;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+  }
+  .hero .badge::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+    animation: pulse 1.6s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
   }
 
-  /* ============ БЛОК ПРОБЛЕМ ============ */
+  .hero h1 {
+    max-width: 900px;
+    margin: 0 auto 20px;
+  }
+  /* Оранжевое выделение чисел */
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+    position: relative;
+  }
+
+  .hero p.sub {
+    font-size: clamp(16px, 2.2vw, 20px);
+    max-width: 620px;
+    margin: 0 auto 36px;
+    color: #c8cdd8;
+  }
+
+  /* ============================================================
+     БЛОК ПРОБЛЕМ
+     ============================================================ */
   .problems-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
   }
   .problem-card {
-    background: var(--bg-soft);
+    background: var(--bg-2);
+    border: 1px solid var(--line);
     border-radius: var(--radius);
     padding: 28px 24px;
-    border: 1px solid var(--border);
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.25s, border-color 0.25s, background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Тонкая оранжевая полоска сверху при hover */
+  .problem-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s;
   }
   .problem-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
+    transform: translateY(-4px);
+    border-color: rgba(255,122,26,0.4);
+    background: var(--bg-3);
   }
-  .problem-card .icon {
-    font-size: 28px;
-    margin-bottom: 12px;
-    display: block;
-  }
-  .problem-card p { font-size: 15px; }
+  .problem-card:hover::before { transform: scaleX(1); }
 
-  /* ============ КВИЗ ============ */
-  .quiz-section { background: var(--bg-soft); }
+  .problem-card .icon {
+    font-size: 32px;
+    margin-bottom: 14px;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(255,122,26,0.3));
+  }
+  .problem-card p { font-size: 15px; color: var(--muted); }
+
+  /* ============================================================
+     КВИЗ
+     ============================================================ */
+  .quiz-section { background: var(--bg-2); }
 
   .quiz-card {
-    background: #fff;
+    background: var(--bg);
+    border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 36px 32px;
-    max-width: 640px;
+    padding: 40px 36px;
+    max-width: 660px;
     margin: 0 auto;
-    box-shadow: var(--shadow);
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
   }
 
-  .progress-wrap {
-    height: 6px;
-    background: var(--border);
+  /* --- Прогресс-бар в виде дороги с машинкой --- */
+  .road-wrap {
+    position: relative;
+    padding: 8px 0 30px;
+    margin-bottom: 8px;
+  }
+  .road {
+    height: 10px;
+    background: #2a2f3a;
     border-radius: 999px;
-    overflow: hidden;
-    margin-bottom: 12px;
+    position: relative;
+    overflow: visible;
   }
-  .progress-bar {
+  /* Прерывистая разметка поверх дороги */
+  .road::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 2px;
+    transform: translateY(-50%);
+    background: repeating-linear-gradient(
+      to right,
+      var(--accent-2) 0 12px,
+      transparent 12px 24px
+    );
+    opacity: 0.5;
+  }
+  .road-fill {
     height: 100%;
-    background: var(--accent);
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 999px;
     width: 0%;
-    transition: width 0.35s ease;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 16px var(--accent-glow);
+    position: relative;
+    z-index: 1;
   }
+  /* Машинка, которая едет по дороге */
+  .car {
+    position: absolute;
+    top: 50%;
+    left: 0%;
+    transform: translate(-50%, -65%);
+    font-size: 28px;
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    pointer-events: none;
+  }
+  /* Фары машины — световой конус */
+  .car::after {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    height: 20px;
+    background: linear-gradient(to left, rgba(255,212,0,0.5), transparent);
+    filter: blur(6px);
+    opacity: 0.7;
+  }
+
   .progress-text {
     font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
+    color: var(--muted);
     text-align: right;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
   }
 
+  /* --- Вопрос и ответы --- */
   .question-title {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 20px;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: 800;
+    margin: 8px 0 24px;
+    letter-spacing: -0.01em;
   }
 
   .answers { display: flex; flex-direction: column; gap: 10px; }
 
   .answer {
-    display: block;
-    padding: 14px 18px;
-    border: 1.5px solid var(--border);
+    padding: 16px 20px;
+    border: 1.5px solid var(--line);
     border-radius: 12px;
     cursor: pointer;
     font-size: 15px;
-    transition: border-color 0.15s, background 0.15s;
-    background: #fff;
+    font-weight: 600;
+    transition: all 0.15s;
+    background: var(--bg-2);
     text-align: left;
     font-family: inherit;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
-  .answer:hover { border-color: #c9cedb; }
+  .answer::before {
+    content: '';
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--line);
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .answer:hover {
+    border-color: rgba(255,122,26,0.5);
+    background: var(--bg-3);
+  }
   .answer.selected {
     border-color: var(--accent);
-    background: #fff6f2;
+    background: rgba(255,122,26,0.08);
+  }
+  .answer.selected::before {
+    border-color: var(--accent);
+    background: var(--accent);
+    box-shadow: inset 0 0 0 3px var(--bg-2);
   }
 
   .quiz-nav {
     display: flex;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 28px;
   }
   .quiz-nav .btn { flex: 1; padding: 14px 20px; }
   .quiz-nav .btn-ghost { flex: 0 0 auto; }
 
-  /* Скрытые экраны */
+  /* --- Экраны --- */
   .screen { display: none; }
-  .screen.active { display: block; animation: fadeIn 0.3s ease; }
+  .screen.active { display: block; animation: fadeIn 0.35s ease; }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
-  /* ============ РЕЗУЛЬТАТ ============ */
-  .result-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
-  .result-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+  /* ============================================================
+     РЕЗУЛЬТАТ
+     ============================================================ */
+  .result-emoji { font-size: 56px; display: block; margin-bottom: 16px; }
+  .result-title { font-size: 26px; font-weight: 800; margin-bottom: 12px; }
   .result-sum {
-    font-size: 32px;
+    font-size: clamp(28px, 4vw, 38px);
     font-weight: 800;
     color: var(--accent);
-    margin: 16px 0;
+    margin: 20px 0;
     letter-spacing: -0.02em;
+    text-shadow: 0 0 30px var(--accent-glow);
   }
-  .result-text { font-size: 15px; margin-bottom: 24px; }
+  .result-text { font-size: 15px; margin-bottom: 28px; color: var(--muted); }
 
-  /* ============ ФОРМА ============ */
-  .form-section { background: var(--bg); }
+  /* ============================================================
+     ФОРМА
+     ============================================================ */
   .form-card {
-    max-width: 480px;
+    max-width: 500px;
     margin: 0 auto;
-    background: #fff;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 36px 32px;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
+    padding: 40px 36px;
     text-align: center;
   }
-  .form-card h2 { margin-bottom: 8px; font-size: 26px; }
-  .form-card > p { margin-bottom: 24px; font-size: 15px; }
+  .form-card h2 { margin-bottom: 12px; font-size: 28px; }
+  .form-card > p { margin-bottom: 28px; font-size: 15px; }
 
   .form-group { text-align: left; margin-bottom: 14px; }
   .form-group label {
     display: block;
     font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-weight: 700;
+    margin-bottom: 8px;
     color: var(--text);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
   .form-group input {
     width: 100%;
     padding: 14px 16px;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid var(--line);
     border-radius: 12px;
     font-size: 15px;
     font-family: inherit;
-    transition: border-color 0.15s;
-    background: #fff;
+    transition: border-color 0.15s, background 0.15s;
+    background: var(--bg);
     color: var(--text);
   }
+  .form-group input::placeholder { color: #565e6e; }
   .form-group input:focus {
     outline: none;
     border-color: var(--accent);
+    background: #0c0e12;
   }
-  .form-card .btn { width: 100%; margin-top: 8px; }
+  .form-card .btn { width: 100%; margin-top: 10px; }
   .form-note {
     font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 12px;
+    color: var(--muted);
+    margin-top: 14px;
   }
   .form-status {
     margin-top: 14px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     min-height: 20px;
   }
-  .form-status.ok { color: #1a8a3f; }
-  .form-status.err { color: #d32f2f; }
+  .form-status.ok { color: #4ade80; }
+  .form-status.err { color: #f87171; }
 
-  /* ============ ФИНАЛЬНЫЙ CTA ============ */
+  /* ============================================================
+     ФИНАЛЬНЫЙ CTA — с фоном приборной панели
+     ============================================================ */
   .final-cta {
-    background: var(--text);
-    color: #fff;
+    position: relative;
+    overflow: hidden;
     text-align: center;
     border-radius: var(--radius);
-    padding: 56px 32px;
+    padding: 72px 32px;
+    border: 1px solid var(--line);
   }
-  .final-cta h2 { color: #fff; margin-bottom: 16px; }
-  .final-cta p { color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto 28px; }
+  .final-cta::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('dashboard.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.25;
+    z-index: -1;
+  }
+  .final-cta::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(15,17,21,0.7) 0%, rgba(15,17,21,0.95) 100%);
+    z-index: -1;
+  }
+  .final-cta h2 { margin-bottom: 16px; }
+  .final-cta p { color: #c8cdd8; max-width: 540px; margin: 0 auto 32px; }
 
-  /* ============ АДАПТИВ ============ */
+  /* ============================================================
+     АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ
+     ============================================================ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ============================================================
+     АДАПТИВ
+     ============================================================ */
   @media (max-width: 600px) {
-    section { padding: 48px 0; }
-    .hero { padding: 56px 0 40px; }
-    .quiz-card { padding: 28px 20px; }
-    .form-card { padding: 28px 20px; }
-    .final-cta { padding: 40px 20px; }
+    section { padding: 56px 0; }
+    .hero { padding: 72px 0 80px; }
+    .quiz-card { padding: 28px 22px; }
+    .form-card { padding: 32px 22px; }
+    .final-cta { padding: 48px 20px; }
     .quiz-nav { flex-direction: column; }
     .quiz-nav .btn-ghost { flex: 1; }
+    .car { font-size: 24px; }
   }
 </style>
 </head>
@@ -287,33 +511,35 @@
 <header class="hero">
   <div class="container">
     <span class="badge">Бесплатный квиз · 60 секунд</span>
-    <h1>Твой авто тайно съедает<br>40 000 ₽ в год</h1>
+    <h1>Твой авто тайно съедает <em>40 000 ₽</em> в год</h1>
     <p class="sub">Пройди короткий квиз и узнай, сколько ты переплачиваешь на ремонтах, ТО и расходниках. Без регистрации, без звонков — только цифры.</p>
     <button class="btn" onclick="document.getElementById('quiz').scrollIntoView()">Пройти квиз →</button>
   </div>
 </header>
 
+<div class="stripe"></div>
+
 <!-- ============ БЛОК ПРОБЛЕМ ============ -->
 <section>
   <div class="container">
-    <h2>Ты узнаёшь себя?</h2>
+    <h2 class="reveal">Ты узнаёшь себя?</h2>
     <div class="problems-grid">
-      <div class="problem-card">
+      <div class="problem-card reveal">
         <span class="icon">🔧</span>
         <h3>«Сколько я уже вбухал?»</h3>
         <p>Помнишь, что недавно было ТО, потом колодки, потом ещё что-то. А сколько всего за год — не помнишь. И это нормально. Но деньги-то ушли.</p>
       </div>
-      <div class="problem-card">
+      <div class="problem-card reveal">
         <span class="icon">💸</span>
         <h3>Сервис называет сумму — ты платишь</h3>
         <p>«Тут ещё вот это надо поменять...» — и ты соглашаешься, потому что не помнишь, когда менял это в последний раз. А может, и не надо было.</p>
       </div>
-      <div class="problem-card">
+      <div class="problem-card reveal">
         <span class="icon">⏰</span>
         <h3>Расходники меняются «по ощущениям»</h3>
         <p>Масло — когда вспомнил. Фильтры — когда мастер сказал. Ремень ГРМ — когда уже поздно. Либо переплата, либо дорогой ремонт.</p>
       </div>
-      <div class="problem-card">
+      <div class="problem-card reveal">
         <span class="icon">📉</span>
         <h3>Машина дешевеет — а ты не знаешь почему</h3>
         <p>Нет истории обслуживания — нет понимания, сколько авто реально стоило за год. Продавать сложнее, торговаться нечем.</p>
@@ -322,11 +548,20 @@
   </div>
 </section>
 
+<div class="stripe"></div>
+
 <!-- ============ КВИЗ ============ -->
 <section class="quiz-section" id="quiz">
   <div class="container">
     <div class="quiz-card">
-      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+      <!-- Прогресс-бар в виде дороги с машинкой -->
+      <div class="road-wrap">
+        <div class="road">
+          <div class="road-fill" id="roadFill"></div>
+          <div class="car" id="car">🚗</div>
+        </div>
+      </div>
       <div class="progress-text" id="progressText">Вопрос 1 из 6</div>
 
       <!-- Экран квиза -->
@@ -347,14 +582,17 @@
         <p class="result-text" id="resultText"></p>
         <button class="btn" onclick="document.getElementById('form').scrollIntoView()">Забрать доступ к боту →</button>
       </div>
+
     </div>
   </div>
 </section>
 
+<div class="stripe"></div>
+
 <!-- ============ ФОРМА ============ -->
-<section class="form-section" id="form">
+<section id="form">
   <div class="container">
-    <div class="form-card">
+    <div class="form-card reveal">
       <h2>Получи доступ к боту</h2>
       <p>Бот ведёт учёт ремонтов, затрат и напоминает о замене расходников. Ты просто пишешь ему «заменил масло, 4500 ₽» — он всё запоминает.</p>
 
@@ -378,7 +616,7 @@
 <!-- ============ ФИНАЛЬНЫЙ CTA ============ -->
 <section>
   <div class="container">
-    <div class="final-cta">
+    <div class="final-cta reveal">
       <h2>Твоя машина не станет дешевле в обслуживании</h2>
       <p>Но ты можешь перестать платить лишнее. Начни вести учёт за 2 минуты — без таблиц, без чеков, без головной боли.</p>
       <button class="btn" onclick="document.getElementById('form').scrollIntoView()">Получить доступ →</button>
@@ -389,7 +627,6 @@
 <script>
 /* ============================================================
    ДАННЫЕ КВИЗА
-   Каждый вопрос: текст + варианты с баллами (score) для расчёта
    ============================================================ */
 const QUESTIONS = [
   {
@@ -448,13 +685,10 @@ const QUESTIONS = [
   }
 ];
 
-/* ============================================================
-   СОСТОЯНИЕ КВИЗА
-   ============================================================ */
 let currentQuestion = 0;
 let answers = new Array(QUESTIONS.length).fill(null);
 let totalScore = 0;
-let monthlySpend = 5000; // дефолт, если вопрос 2 не пройден
+let monthlySpend = 5000;
 
 /* ============================================================
    РЕНДЕР ВОПРОСА
@@ -474,13 +708,16 @@ function renderQuestion() {
     answersBox.appendChild(btn);
   });
 
-  // Прогресс
+  // Прогресс: считаем по текущему шагу
   const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
-  document.getElementById('progressBar').style.width = progress + '%';
-  document.getElementById('progressText').textContent = `Вопрос ${currentQuestion + 1} из ${QUESTIONS.length}`;
+  document.getElementById('roadFill').style.width = progress + '%';
+  // Машинка едет вместе с прогрессом
+  document.getElementById('car').style.left = progress + '%';
+  document.getElementById('progressText').textContent =
+    `Вопрос ${currentQuestion + 1} из ${QUESTIONS.length}`;
 
-  // Кнопки навигации
-  document.getElementById('backBtn').style.display = currentQuestion === 0 ? 'none' : 'inline-block';
+  document.getElementById('backBtn').style.display =
+    currentQuestion === 0 ? 'none' : 'inline-block';
   document.getElementById('nextBtn').disabled = answers[currentQuestion] === null;
   document.getElementById('nextBtn').textContent =
     currentQuestion === QUESTIONS.length - 1 ? 'Узнать результат →' : 'Далее →';
@@ -491,149 +728,14 @@ function renderQuestion() {
    ============================================================ */
 function selectAnswer(idx) {
   answers[currentQuestion] = idx;
-  // Пересчёт баллов и месячных трат
   recalcTotals();
   renderQuestion();
 }
 
-/* ============================================================
-   ПЕРЕСЧЁТ БАЛЛОВ И ТРАТ
-   ============================================================ */
 function recalcTotals() {
   totalScore = 0;
   monthlySpend = 5000;
   answers.forEach((ansIdx, qIdx) => {
     if (ansIdx !== null) {
       const ans = QUESTIONS[qIdx].answers[ansIdx];
-      totalScore += ans.score || 0;
-      if (ans.monthly) monthlySpend = ans.monthly;
-    }
-  });
-}
-
-/* ============================================================
-   НАВИГАЦИЯ
-   ============================================================ */
-function nextQuestion() {
-  if (answers[currentQuestion] === null) return;
-  if (currentQuestion < QUESTIONS.length - 1) {
-    currentQuestion++;
-    renderQuestion();
-  } else {
-    showResult();
-  }
-}
-
-function prevQuestion() {
-  if (currentQuestion > 0) {
-    currentQuestion--;
-    renderQuestion();
-  }
-}
-
-/* ============================================================
-   ПОКАЗ РЕЗУЛЬТАТА
-   Логика: 1–6 баллов — низкий, 7–12 — средний, 13–18 — высокий
-   ============================================================ */
-function showResult() {
-  document.getElementById('quizScreen').classList.remove('active');
-  document.getElementById('resultScreen').classList.add('active');
-
-  const annual = monthlySpend * 12;
-  let emoji, title, percentLow, percentHigh, text;
-
-  if (totalScore <= 6) {
-    emoji = '🟢';
-    title = 'Ты в порядке. Но есть куда расти';
-    percentLow = 5; percentHigh = 15;
-    text = 'Ты следишь за машиной лучше большинства. Но даже при аккуратном подходе теряется часть бюджета — на «на всякий случай» заменах и мелких работах.';
-  } else if (totalScore <= 12) {
-    emoji = '🟡';
-    title = 'Ты переплачиваешь. Но пока не критично';
-    percentLow = 20; percentHigh = 35;
-    text = 'Ты помнишь о машине, но не всегда контролируешь процесс. Самое обидное: половину этих денег можно было не тратить — причина в отсутствии системы.';
-  } else {
-    emoji = '🔴';
-    title = 'Стоп. Ты теряешь серьёзные деньги';
-    percentLow = 40; percentHigh = 60;
-    text = 'По твоим ответам — ты отдаёшь сервисам существенную часть бюджета сверх необходимого. Ты не обязан помнить всё. Но пока не помнишь — платишь больше, чем должен.';
-  }
-
-  const sumLow = Math.round(annual * percentLow / 100 / 1000) * 1000;
-  const sumHigh = Math.round(annual * percentHigh / 100 / 1000) * 1000;
-
-  document.getElementById('resultEmoji').textContent = emoji;
-  document.getElementById('resultTitle').textContent = title;
-  document.getElementById('resultSum').textContent =
-    `≈ ${sumLow.toLocaleString('ru-RU')} – ${sumHigh.toLocaleString('ru-RU')} ₽ в год`;
-  document.getElementById('resultText').textContent = text;
-
-  // Прокрутка к результату
-  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
-}
-
-/* ============================================================
-   ОТПРАВКА ФОРМЫ В GOOGLE SHEETS
-   ⚠️ ЗАМЕНИ URL НИЖЕ НА СВОЙ GOOGLE APPS SCRIPT URL
-   ============================================================ */
-const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/ВАШ_ID/exec';
-
-async function submitForm(e) {
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const status = document.getElementById('formStatus');
-
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-
-  if (!name || !phone) {
-    status.textContent = 'Заполни имя и телефон';
-    status.className = 'form-status err';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Отправляем...';
-  status.textContent = '';
-  status.className = 'form-status';
-
-  // Формируем данные для отправки
-  const payload = {
-    name: name,
-    phone: phone,
-    score: totalScore,
-    monthlySpend: monthlySpend,
-    annualLossLow: Math.round(monthlySpend * 12 * 0.2),
-    annualLossHigh: Math.round(monthlySpend * 12 * 0.4),
-    date: new Date().toISOString()
-  };
-
-  try {
-    // fetch с mode: 'no-cors' — чтобы Google Apps Script принял запрос без CORS-ошибок
-    await fetch(GOOGLE_SHEETS_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    status.textContent = '✓ Готово! Скоро пришлём доступ к боту.';
-    status.className = 'form-status ok';
-    document.getElementById('leadForm').reset();
-  } catch (err) {
-    console.error(err);
-    status.textContent = 'Ошибка отправки. Попробуй ещё раз.';
-    status.className = 'form-status err';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Получить доступ бесплатно →';
-  }
-}
-
-/* ============================================================
-   ИНИЦИАЛИЗАЦИЯ
-   ============================================================ */
-renderQuestion();
-</script>
-</body>
-</html>
+      totalScore += ans.score || 0
