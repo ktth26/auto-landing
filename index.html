@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сколько ты переплачиваешь на авто? — узнай за 60 секунд</title>
+<style>
+  /* ============ БАЗОВЫЕ СТИЛИ ============ */
+  :root {
+    --accent: #ff5a1f;
+    --accent-dark: #e04a13;
+    --bg: #ffffff;
+    --bg-soft: #f7f8fa;
+    --text: #14171f;
+    --text-muted: #5b6472;
+    --border: #e6e8ee;
+    --radius: 16px;
+    --shadow: 0 8px 24px rgba(20, 23, 31, 0.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  section { padding: 64px 0; }
+
+  h1, h2, h3 { line-height: 1.15; letter-spacing: -0.02em; }
+
+  h1 { font-size: clamp(28px, 5vw, 48px); font-weight: 800; }
+  h2 { font-size: clamp(24px, 4vw, 36px); font-weight: 800; margin-bottom: 32px; }
+  h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+
+  p { color: var(--text-muted); }
+
+  /* ============ КНОПКИ ============ */
+  .btn {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    padding: 16px 32px;
+    border: none;
+    border-radius: 999px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    text-decoration: none;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--accent-dark); }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--bg-soft); color: var(--text); }
+
+  /* ============ HERO ============ */
+  .hero {
+    background: linear-gradient(180deg, #fff 0%, var(--bg-soft) 100%);
+    padding: 80px 0 64px;
+    text-align: center;
+  }
+  .hero p.sub {
+    font-size: clamp(16px, 2.2vw, 20px);
+    max-width: 640px;
+    margin: 20px auto 32px;
+  }
+  .hero .badge {
+    display: inline-block;
+    background: #fff1eb;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+
+  /* ============ БЛОК ПРОБЛЕМ ============ */
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+  }
+  .problem-card {
+    background: var(--bg-soft);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .problem-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+  .problem-card .icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .problem-card p { font-size: 15px; }
+
+  /* ============ КВИЗ ============ */
+  .quiz-section { background: var(--bg-soft); }
+
+  .quiz-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    max-width: 640px;
+    margin: 0 auto;
+    box-shadow: var(--shadow);
+  }
+
+  .progress-wrap {
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.35s ease;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    text-align: right;
+  }
+
+  .question-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .answers { display: flex; flex-direction: column; gap: 10px; }
+
+  .answer {
+    display: block;
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: border-color 0.15s, background 0.15s;
+    background: #fff;
+    text-align: left;
+    font-family: inherit;
+    color: var(--text);
+  }
+  .answer:hover { border-color: #c9cedb; }
+  .answer.selected {
+    border-color: var(--accent);
+    background: #fff6f2;
+  }
+
+  .quiz-nav {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .quiz-nav .btn { flex: 1; padding: 14px 20px; }
+  .quiz-nav .btn-ghost { flex: 0 0 auto; }
+
+  /* Скрытые экраны */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.3s ease; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============ РЕЗУЛЬТАТ ============ */
+  .result-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+  .result-title { font-size: 24px; font-weight: 800; margin-bottom: 12px; }
+  .result-sum {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 16px 0;
+    letter-spacing: -0.02em;
+  }
+  .result-text { font-size: 15px; margin-bottom: 24px; }
+
+  /* ============ ФОРМА ============ */
+  .form-section { background: var(--bg); }
+  .form-card {
+    max-width: 480px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 36px 32px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .form-card h2 { margin-bottom: 8px; font-size: 26px; }
+  .form-card > p { margin-bottom: 24px; font-size: 15px; }
+
+  .form-group { text-align: left; margin-bottom: 14px; }
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+    background: #fff;
+    color: var(--text);
+  }
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .form-card .btn { width: 100%; margin-top: 8px; }
+  .form-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 12px;
+  }
+  .form-status {
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    min-height: 20px;
+  }
+  .form-status.ok { color: #1a8a3f; }
+  .form-status.err { color: #d32f2f; }
+
+  /* ============ ФИНАЛЬНЫЙ CTA ============ */
+  .final-cta {
+    background: var(--text);
+    color: #fff;
+    text-align: center;
+    border-radius: var(--radius);
+    padding: 56px 32px;
+  }
+  .final-cta h2 { color: #fff; margin-bottom: 16px; }
+  .final-cta p { color: rgba(255,255,255,0.7); max-width: 520px; margin: 0 auto 28px; }
+
+  /* ============ АДАПТИВ ============ */
+  @media (max-width: 600px) {
+    section { padding: 48px 0; }
+    .hero { padding: 56px 0 40px; }
+    .quiz-card { padding: 28px 20px; }
+    .form-card { padding: 28px 20px; }
+    .final-cta { padding: 40px 20px; }
+    .quiz-nav { flex-direction: column; }
+    .quiz-nav .btn-ghost { flex: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="container">
+    <span class="badge">Бесплатный квиз · 60 секунд</span>
+    <h1>Твой авто тайно съедает<br>40 000 ₽ в год</h1>
+    <p class="sub">Пройди короткий квиз и узнай, сколько ты переплачиваешь на ремонтах, ТО и расходниках. Без регистрации, без звонков — только цифры.</p>
+    <button class="btn" onclick="document.getElementById('quiz').scrollIntoView()">Пройти квиз →</button>
+  </div>
+</header>
+
+<!-- ============ БЛОК ПРОБЛЕМ ============ -->
+<section>
+  <div class="container">
+    <h2>Ты узнаёшь себя?</h2>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <span class="icon">🔧</span>
+        <h3>«Сколько я уже вбухал?»</h3>
+        <p>Помнишь, что недавно было ТО, потом колодки, потом ещё что-то. А сколько всего за год — не помнишь. И это нормально. Но деньги-то ушли.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">💸</span>
+        <h3>Сервис называет сумму — ты платишь</h3>
+        <p>«Тут ещё вот это надо поменять...» — и ты соглашаешься, потому что не помнишь, когда менял это в последний раз. А может, и не надо было.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">⏰</span>
+        <h3>Расходники меняются «по ощущениям»</h3>
+        <p>Масло — когда вспомнил. Фильтры — когда мастер сказал. Ремень ГРМ — когда уже поздно. Либо переплата, либо дорогой ремонт.</p>
+      </div>
+      <div class="problem-card">
+        <span class="icon">📉</span>
+        <h3>Машина дешевеет — а ты не знаешь почему</h3>
+        <p>Нет истории обслуживания — нет понимания, сколько авто реально стоило за год. Продавать сложнее, торговаться нечем.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ КВИЗ ============ -->
+<section class="quiz-section" id="quiz">
+  <div class="container">
+    <div class="quiz-card">
+      <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      <div class="progress-text" id="progressText">Вопрос 1 из 6</div>
+
+      <!-- Экран квиза -->
+      <div id="quizScreen" class="screen active">
+        <div class="question-title" id="questionTitle">Загрузка...</div>
+        <div class="answers" id="answersBox"></div>
+        <div class="quiz-nav">
+          <button class="btn btn-ghost" id="backBtn" onclick="prevQuestion()" style="display:none;">← Назад</button>
+          <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Далее →</button>
+        </div>
+      </div>
+
+      <!-- Экран результата -->
+      <div id="resultScreen" class="screen">
+        <span class="result-emoji" id="resultEmoji">🟢</span>
+        <div class="result-title" id="resultTitle"></div>
+        <div class="result-sum" id="resultSum"></div>
+        <p class="result-text" id="resultText"></p>
+        <button class="btn" onclick="document.getElementById('form').scrollIntoView()">Забрать доступ к боту →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ФОРМА ============ -->
+<section class="form-section" id="form">
+  <div class="container">
+    <div class="form-card">
+      <h2>Получи доступ к боту</h2>
+      <p>Бот ведёт учёт ремонтов, затрат и напоминает о замене расходников. Ты просто пишешь ему «заменил масло, 4500 ₽» — он всё запоминает.</p>
+
+      <form id="leadForm" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label for="name">Имя</label>
+          <input type="text" id="name" name="name" required placeholder="Как тебя зовут?">
+        </div>
+        <div class="form-group">
+          <label for="phone">Телефон или Telegram</label>
+          <input type="text" id="phone" name="phone" required placeholder="+7 900 000-00-00 или @username">
+        </div>
+        <button type="submit" class="btn" id="submitBtn">Получить доступ бесплатно →</button>
+        <div class="form-status" id="formStatus"></div>
+        <div class="form-note">Никакого спама. Только доступ к боту и одно письмо с инструкцией.</div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ФИНАЛЬНЫЙ CTA ============ -->
+<section>
+  <div class="container">
+    <div class="final-cta">
+      <h2>Твоя машина не станет дешевле в обслуживании</h2>
+      <p>Но ты можешь перестать платить лишнее. Начни вести учёт за 2 минуты — без таблиц, без чеков, без головной боли.</p>
+      <button class="btn" onclick="document.getElementById('form').scrollIntoView()">Получить доступ →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ============================================================
+   ДАННЫЕ КВИЗА
+   Каждый вопрос: текст + варианты с баллами (score) для расчёта
+   ============================================================ */
+const QUESTIONS = [
+  {
+    title: "Как ты сейчас ведёшь учёт расходов на авто?",
+    answers: [
+      { text: "Никак, всё в голове (или уже забыл)", score: 3 },
+      { text: "Записываю иногда в заметки на телефоне", score: 2 },
+      { text: "Есть таблица в Excel или приложение", score: 1 },
+      { text: "Веду подробно, с чеками и историей", score: 0 }
+    ]
+  },
+  {
+    title: "Сколько примерно ты тратишь на авто в месяц (без бензина)?",
+    answers: [
+      { text: "До 3 000 ₽", score: 1, monthly: 2000 },
+      { text: "3 000 – 7 000 ₽", score: 2, monthly: 5000 },
+      { text: "7 000 – 15 000 ₽", score: 3, monthly: 11000 },
+      { text: "Больше 15 000 ₽ / не считал", score: 4, monthly: 18000 }
+    ]
+  },
+  {
+    title: "Когда ты последний раз менял масло?",
+    answers: [
+      { text: "Помню точную дату и пробег", score: 0 },
+      { text: "Примерно помню, но не уверен", score: 1 },
+      { text: "Меняю, когда «пора» — на глаз", score: 2 },
+      { text: "Честно? Не помню", score: 3 }
+    ]
+  },
+  {
+    title: "Как ты выбираешь сервис?",
+    answers: [
+      { text: "Есть постоянный мастер, которому доверяю", score: 0 },
+      { text: "Езжу к официалам", score: 1 },
+      { text: "Ищу по отзывам каждый раз", score: 2 },
+      { text: "Куда удобно / где дешевле", score: 3 }
+    ]
+  },
+  {
+    title: "Бывало, что сервис навязывал лишние работы?",
+    answers: [
+      { text: "Нет, такого не было", score: 0 },
+      { text: "Бывало, но я отказывался", score: 1 },
+      { text: "Да, и я соглашался, потому что не знал", score: 3 },
+      { text: "Постоянно с этим сталкиваюсь", score: 4 }
+    ]
+  },
+  {
+    title: "Что бы ты хотел контролировать в первую очередь?",
+    answers: [
+      { text: "Чтобы напоминали о замене расходников", score: 1 },
+      { text: "Чтобы я видел, сколько реально трачу", score: 1 },
+      { text: "Чтобы сервис не мог «развести» на лишнее", score: 1 },
+      { text: "Чтобы была история для продажи авто", score: 1 }
+    ]
+  }
+];
+
+/* ============================================================
+   СОСТОЯНИЕ КВИЗА
+   ============================================================ */
+let currentQuestion = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let totalScore = 0;
+let monthlySpend = 5000; // дефолт, если вопрос 2 не пройден
+
+/* ============================================================
+   РЕНДЕР ВОПРОСА
+   ============================================================ */
+function renderQuestion() {
+  const q = QUESTIONS[currentQuestion];
+  document.getElementById('questionTitle').textContent = q.title;
+
+  const answersBox = document.getElementById('answersBox');
+  answersBox.innerHTML = '';
+
+  q.answers.forEach((ans, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer' + (answers[currentQuestion] === idx ? ' selected' : '');
+    btn.textContent = ans.text;
+    btn.onclick = () => selectAnswer(idx);
+    answersBox.appendChild(btn);
+  });
+
+  // Прогресс
+  const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
+  document.getElementById('progressBar').style.width = progress + '%';
+  document.getElementById('progressText').textContent = `Вопрос ${currentQuestion + 1} из ${QUESTIONS.length}`;
+
+  // Кнопки навигации
+  document.getElementById('backBtn').style.display = currentQuestion === 0 ? 'none' : 'inline-block';
+  document.getElementById('nextBtn').disabled = answers[currentQuestion] === null;
+  document.getElementById('nextBtn').textContent =
+    currentQuestion === QUESTIONS.length - 1 ? 'Узнать результат →' : 'Далее →';
+}
+
+/* ============================================================
+   ВЫБОР ОТВЕТА
+   ============================================================ */
+function selectAnswer(idx) {
+  answers[currentQuestion] = idx;
+  // Пересчёт баллов и месячных трат
+  recalcTotals();
+  renderQuestion();
+}
+
+/* ============================================================
+   ПЕРЕСЧЁТ БАЛЛОВ И ТРАТ
+   ============================================================ */
+function recalcTotals() {
+  totalScore = 0;
+  monthlySpend = 5000;
+  answers.forEach((ansIdx, qIdx) => {
+    if (ansIdx !== null) {
+      const ans = QUESTIONS[qIdx].answers[ansIdx];
+      totalScore += ans.score || 0;
+      if (ans.monthly) monthlySpend = ans.monthly;
+    }
+  });
+}
+
+/* ============================================================
+   НАВИГАЦИЯ
+   ============================================================ */
+function nextQuestion() {
+  if (answers[currentQuestion] === null) return;
+  if (currentQuestion < QUESTIONS.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+/* ============================================================
+   ПОКАЗ РЕЗУЛЬТАТА
+   Логика: 1–6 баллов — низкий, 7–12 — средний, 13–18 — высокий
+   ============================================================ */
+function showResult() {
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('resultScreen').classList.add('active');
+
+  const annual = monthlySpend * 12;
+  let emoji, title, percentLow, percentHigh, text;
+
+  if (totalScore <= 6) {
+    emoji = '🟢';
+    title = 'Ты в порядке. Но есть куда расти';
+    percentLow = 5; percentHigh = 15;
+    text = 'Ты следишь за машиной лучше большинства. Но даже при аккуратном подходе теряется часть бюджета — на «на всякий случай» заменах и мелких работах.';
+  } else if (totalScore <= 12) {
+    emoji = '🟡';
+    title = 'Ты переплачиваешь. Но пока не критично';
+    percentLow = 20; percentHigh = 35;
+    text = 'Ты помнишь о машине, но не всегда контролируешь процесс. Самое обидное: половину этих денег можно было не тратить — причина в отсутствии системы.';
+  } else {
+    emoji = '🔴';
+    title = 'Стоп. Ты теряешь серьёзные деньги';
+    percentLow = 40; percentHigh = 60;
+    text = 'По твоим ответам — ты отдаёшь сервисам существенную часть бюджета сверх необходимого. Ты не обязан помнить всё. Но пока не помнишь — платишь больше, чем должен.';
+  }
+
+  const sumLow = Math.round(annual * percentLow / 100 / 1000) * 1000;
+  const sumHigh = Math.round(annual * percentHigh / 100 / 1000) * 1000;
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSum').textContent =
+    `≈ ${sumLow.toLocaleString('ru-RU')} – ${sumHigh.toLocaleString('ru-RU')} ₽ в год`;
+  document.getElementById('resultText').textContent = text;
+
+  // Прокрутка к результату
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ============================================================
+   ОТПРАВКА ФОРМЫ В GOOGLE SHEETS
+   ⚠️ ЗАМЕНИ URL НИЖЕ НА СВОЙ GOOGLE APPS SCRIPT URL
+   ============================================================ */
+const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/ВАШ_ID/exec';
+
+async function submitForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const status = document.getElementById('formStatus');
+
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+
+  if (!name || !phone) {
+    status.textContent = 'Заполни имя и телефон';
+    status.className = 'form-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+  status.textContent = '';
+  status.className = 'form-status';
+
+  // Формируем данные для отправки
+  const payload = {
+    name: name,
+    phone: phone,
+    score: totalScore,
+    monthlySpend: monthlySpend,
+    annualLossLow: Math.round(monthlySpend * 12 * 0.2),
+    annualLossHigh: Math.round(monthlySpend * 12 * 0.4),
+    date: new Date().toISOString()
+  };
+
+  try {
+    // fetch с mode: 'no-cors' — чтобы Google Apps Script принял запрос без CORS-ошибок
+    await fetch(GOOGLE_SHEETS_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    status.textContent = '✓ Готово! Скоро пришлём доступ к боту.';
+    status.className = 'form-status ok';
+    document.getElementById('leadForm').reset();
+  } catch (err) {
+    console.error(err);
+    status.textContent = 'Ошибка отправки. Попробуй ещё раз.';
+    status.className = 'form-status err';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Получить доступ бесплатно →';
+  }
+}
+
+/* ============================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ============================================================ */
+renderQuestion();
+</script>
+</body>
+</html>
