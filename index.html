@@ -5,65 +5,93 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Сколько ты переплачиваешь на авто? — узнай за 60 секунд</title>
 
-<!-- Шрифты -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   /* ============================================================
-     ТЕМА «ГАРАЖ» — тёмный фон, металл, дорожные акценты
+     ТЕМА: СВЕТЛЫЙ БЕТОН + ГАРАЖНЫЕ АКЦЕНТЫ
      ============================================================ */
   :root {
-    --bg: #0f1115;              /* основной тёмный */
-    --bg-2: #171a21;            /* чуть светлее для карточек */
-    --bg-3: #1e222b;            /* ещё светлее для hover */
-    --line: #2a2f3a;            /* границы */
-    --text: #f1f3f7;            /* основной текст */
-    --muted: #8b93a3;           /* приглушённый текст */
-    --accent: #ff7a1a;          /* дорожный оранжевый */
-    --accent-2: #ffd400;        /* сигнальный жёлтый */
-    --accent-glow: rgba(255, 122, 26, 0.35);
+    --bg: #d9d6cf;            /* бетон */
+    --bg-soft: #e5e2db;       /* светлее бетона */
+    --card: #f4f2ed;          /* карточки */
+    --card-2: #ebe8e1;        /* карточки на hover */
+    --line: #c4bfb5;          /* границы */
+    --line-soft: #d4cfc6;
+    --text: #1a1c20;          /* почти чёрный, но мягкий */
+    --muted: #5f5b52;         /* приглушённый серо-коричневый */
+    --accent: #e65c00;        /* дорожный оранжевый, чуть темнее для контраста */
+    --accent-2: #f0b400;      /* сигнальный жёлтый */
+    --accent-glow: rgba(230, 92, 0, 0.3);
     --radius: 16px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   html { scroll-behavior: smooth; }
 
   body {
     font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg);
+    background-color: var(--bg);
     color: var(--text);
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-
-    /* Тонкая текстура «бетон» через повторяющийся градиент */
-    background-image:
-      radial-gradient(circle at 20% 10%, rgba(255,122,26,0.05), transparent 40%),
-      radial-gradient(circle at 80% 90%, rgba(255,212,0,0.03), transparent 40%);
-    background-attachment: fixed;
+    position: relative;
   }
 
-  .container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-  section { padding: 80px 0; position: relative; }
+  /* ЗЕРНО БЕТОНА: SVG-шум поверх фона, очень тонкий */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.33 0 0 0 0 0.3 0 0 0 0.35 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: multiply;
+  }
 
-  h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; font-weight: 800; }
+  /* Лёгкие пятна на бетоне */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(circle at 15% 25%, rgba(0,0,0,0.06), transparent 35%),
+      radial-gradient(circle at 85% 70%, rgba(0,0,0,0.05), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(230,92,0,0.05), transparent 50%);
+  }
+
+  .container {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  section { padding: 80px 0; position: relative; z-index: 1; }
+
+  h1, h2, h3 { line-height: 1.1; letter-spacing: -0.02em; font-weight: 800; color: var(--text); }
   h1 { font-size: clamp(30px, 5.5vw, 56px); }
   h2 { font-size: clamp(26px, 4vw, 40px); margin-bottom: 40px; }
   h3 { font-size: 18px; margin-bottom: 8px; }
   p { color: var(--muted); }
 
-  /* Жёлто-чёрная предупреждающая полоса (разделитель секций) */
+  /* Жёлто-чёрная предупреждающая полоса */
   .stripe {
-    height: 8px;
+    height: 10px;
     background: repeating-linear-gradient(
       -45deg,
       var(--accent-2) 0 20px,
-      #0f1115 20px 40px
+      #1a1c20 20px 40px
     );
-    opacity: 0.85;
+    position: relative;
+    z-index: 1;
   }
 
   /* ============================================================
@@ -72,7 +100,7 @@
   .btn {
     display: inline-block;
     background: var(--accent);
-    color: #0f1115;
+    color: #fff;
     padding: 16px 32px;
     border: none;
     border-radius: 999px;
@@ -86,12 +114,12 @@
     box-shadow: 0 8px 24px var(--accent-glow);
   }
   .btn:hover {
-    background: #ff8c38;
+    background: #ff6b0d;
     transform: translateY(-1px);
     box-shadow: 0 12px 32px var(--accent-glow);
   }
   .btn:active { transform: translateY(0) scale(0.99); }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
 
   .btn-ghost {
     background: transparent;
@@ -99,18 +127,18 @@
     border: 1.5px solid var(--line);
     box-shadow: none;
   }
-  .btn-ghost:hover { background: var(--bg-2); color: var(--text); }
+  .btn-ghost:hover { background: var(--bg-soft); color: var(--text); }
 
   /* ============================================================
-     HERO — гаражная атмосфера
+     HERO — фото гаража поверх бетона
      ============================================================ */
   .hero {
     position: relative;
     padding: 100px 0 120px;
     text-align: center;
     overflow: hidden;
+    isolation: isolate;
   }
-  /* Фоновая картинка гаража с затемнением */
   .hero::before {
     content: '';
     position: absolute;
@@ -118,18 +146,17 @@
     background-image: url('hero.jpg');
     background-size: cover;
     background-position: center;
-    opacity: 0.35;
-    filter: brightness(0.5) contrast(1.1);
+    opacity: 0.55;
+    filter: brightness(0.55) contrast(1.05) sepia(0.15);
     z-index: -2;
   }
-  /* Виньетка + затемнение, чтобы текст читался */
   .hero::after {
     content: '';
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse at center, transparent 0%, rgba(15,17,21,0.85) 70%),
-      linear-gradient(180deg, rgba(15,17,21,0.6) 0%, rgba(15,17,21,0.95) 100%);
+      radial-gradient(ellipse at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.75) 75%),
+      linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%);
     z-index: -1;
   }
 
@@ -137,22 +164,23 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255,122,26,0.12);
-    border: 1px solid rgba(255,122,26,0.3);
-    color: var(--accent);
+    background: rgba(240,180,0,0.18);
+    border: 1px solid rgba(240,180,0,0.5);
+    color: #ffd76a;
     font-size: 13px;
     font-weight: 700;
     padding: 8px 16px;
     border-radius: 999px;
     margin-bottom: 24px;
     letter-spacing: 0.02em;
+    backdrop-filter: blur(6px);
   }
   .hero .badge::before {
     content: '';
     width: 8px; height: 8px;
     border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent);
+    background: #ffd76a;
+    box-shadow: 0 0 12px #ffd76a;
     animation: pulse 1.6s infinite;
   }
   @keyframes pulse {
@@ -161,21 +189,21 @@
   }
 
   .hero h1 {
+    color: #fff;
     max-width: 900px;
     margin: 0 auto 20px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.5);
   }
-  /* Оранжевое выделение чисел */
   .hero h1 em {
     font-style: normal;
-    color: var(--accent);
-    position: relative;
+    color: var(--accent-2);
   }
-
   .hero p.sub {
     font-size: clamp(16px, 2.2vw, 20px);
     max-width: 620px;
     margin: 0 auto 36px;
-    color: #c8cdd8;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
   }
 
   /* ============================================================
@@ -187,20 +215,20 @@
     gap: 20px;
   }
   .problem-card {
-    background: var(--bg-2);
-    border: 1px solid var(--line);
+    background: var(--card);
+    border: 1px solid var(--line-soft);
     border-radius: var(--radius);
     padding: 28px 24px;
-    transition: transform 0.25s, border-color 0.25s, background 0.25s;
+    transition: transform 0.25s, border-color 0.25s, background 0.25s, box-shadow 0.25s;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   }
-  /* Тонкая оранжевая полоска сверху при hover */
   .problem-card::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
-    height: 3px;
+    height: 4px;
     background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
@@ -208,8 +236,9 @@
   }
   .problem-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(255,122,26,0.4);
-    background: var(--bg-3);
+    border-color: rgba(230,92,0,0.4);
+    background: #fff;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
   }
   .problem-card:hover::before { transform: scaleX(1); }
 
@@ -217,52 +246,53 @@
     font-size: 32px;
     margin-bottom: 14px;
     display: block;
-    filter: drop-shadow(0 0 12px rgba(255,122,26,0.3));
   }
   .problem-card p { font-size: 15px; color: var(--muted); }
 
   /* ============================================================
      КВИЗ
      ============================================================ */
-  .quiz-section { background: var(--bg-2); }
+  .quiz-section {
+    background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.04) 100%);
+  }
 
   .quiz-card {
-    background: var(--bg);
-    border: 1px solid var(--line);
+    background: var(--card);
+    border: 1px solid var(--line-soft);
     border-radius: var(--radius);
     padding: 40px 36px;
     max-width: 660px;
     margin: 0 auto;
     position: relative;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.12);
   }
 
   /* --- Прогресс-бар в виде дороги с машинкой --- */
   .road-wrap {
     position: relative;
-    padding: 8px 0 30px;
+    padding: 8px 0 34px;
     margin-bottom: 8px;
   }
   .road {
-    height: 10px;
-    background: #2a2f3a;
+    height: 14px;
+    background: #4a4a4a;
     border-radius: 999px;
     position: relative;
-    overflow: visible;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.3);
   }
   /* Прерывистая разметка поверх дороги */
   .road::after {
     content: '';
     position: absolute;
-    top: 50%; left: 0; right: 0;
+    top: 50%; left: 8px; right: 8px;
     height: 2px;
     transform: translateY(-50%);
     background: repeating-linear-gradient(
       to right,
       var(--accent-2) 0 12px,
-      transparent 12px 24px
+      transparent 12px 26px
     );
-    opacity: 0.5;
+    opacity: 0.9;
   }
   .road-fill {
     height: 100%;
@@ -279,14 +309,15 @@
     position: absolute;
     top: 50%;
     left: 0%;
-    transform: translate(-50%, -65%);
-    font-size: 28px;
+    transform: translate(-50%, -70%);
+    font-size: 30px;
     transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 2;
-    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35));
     pointer-events: none;
+    line-height: 1;
   }
-  /* Фары машины — световой конус */
+  /* Свет от фар */
   .car::after {
     content: '';
     position: absolute;
@@ -295,7 +326,7 @@
     transform: translateY(-50%);
     width: 60px;
     height: 20px;
-    background: linear-gradient(to left, rgba(255,212,0,0.5), transparent);
+    background: linear-gradient(to left, rgba(240,180,0,0.6), transparent);
     filter: blur(6px);
     opacity: 0.7;
   }
@@ -304,8 +335,8 @@
     font-size: 13px;
     color: var(--muted);
     text-align: right;
-    font-weight: 600;
-    letter-spacing: 0.03em;
+    font-weight: 700;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
 
@@ -315,6 +346,7 @@
     font-weight: 800;
     margin: 8px 0 24px;
     letter-spacing: -0.01em;
+    color: var(--text);
   }
 
   .answers { display: flex; flex-direction: column; gap: 10px; }
@@ -327,7 +359,7 @@
     font-size: 15px;
     font-weight: 600;
     transition: all 0.15s;
-    background: var(--bg-2);
+    background: #fff;
     text-align: left;
     font-family: inherit;
     color: var(--text);
@@ -342,19 +374,20 @@
     border: 2px solid var(--line);
     flex-shrink: 0;
     transition: all 0.15s;
+    background: #fff;
   }
   .answer:hover {
-    border-color: rgba(255,122,26,0.5);
-    background: var(--bg-3);
+    border-color: rgba(230,92,0,0.5);
+    background: #fffaf5;
   }
   .answer.selected {
     border-color: var(--accent);
-    background: rgba(255,122,26,0.08);
+    background: #fff3e8;
   }
   .answer.selected::before {
     border-color: var(--accent);
     background: var(--accent);
-    box-shadow: inset 0 0 0 3px var(--bg-2);
+    box-shadow: inset 0 0 0 3px #fff;
   }
 
   .quiz-nav {
@@ -385,7 +418,6 @@
     color: var(--accent);
     margin: 20px 0;
     letter-spacing: -0.02em;
-    text-shadow: 0 0 30px var(--accent-glow);
   }
   .result-text { font-size: 15px; margin-bottom: 28px; color: var(--muted); }
 
@@ -395,11 +427,12 @@
   .form-card {
     max-width: 500px;
     margin: 0 auto;
-    background: var(--bg-2);
-    border: 1px solid var(--line);
+    background: var(--card);
+    border: 1px solid var(--line-soft);
     border-radius: var(--radius);
     padding: 40px 36px;
     text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.1);
   }
   .form-card h2 { margin-bottom: 12px; font-size: 28px; }
   .form-card > p { margin-bottom: 28px; font-size: 15px; }
@@ -411,7 +444,7 @@
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
   }
   .form-group input {
@@ -421,15 +454,15 @@
     border-radius: 12px;
     font-size: 15px;
     font-family: inherit;
-    transition: border-color 0.15s, background 0.15s;
-    background: var(--bg);
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    background: #fff;
     color: var(--text);
   }
-  .form-group input::placeholder { color: #565e6e; }
+  .form-group input::placeholder { color: #a39d92; }
   .form-group input:focus {
     outline: none;
     border-color: var(--accent);
-    background: #0c0e12;
+    box-shadow: 0 0 0 4px rgba(230,92,0,0.12);
   }
   .form-card .btn { width: 100%; margin-top: 10px; }
   .form-note {
@@ -443,11 +476,11 @@
     font-weight: 700;
     min-height: 20px;
   }
-  .form-status.ok { color: #4ade80; }
-  .form-status.err { color: #f87171; }
+  .form-status.ok { color: #1a8a3f; }
+  .form-status.err { color: #c62828; }
 
   /* ============================================================
-     ФИНАЛЬНЫЙ CTA — с фоном приборной панели
+     ФИНАЛЬНЫЙ CTA
      ============================================================ */
   .final-cta {
     position: relative;
@@ -455,7 +488,8 @@
     text-align: center;
     border-radius: var(--radius);
     padding: 72px 32px;
-    border: 1px solid var(--line);
+    isolation: isolate;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.15);
   }
   .final-cta::before {
     content: '';
@@ -464,18 +498,19 @@
     background-image: url('dashboard.jpg');
     background-size: cover;
     background-position: center;
-    opacity: 0.25;
-    z-index: -1;
+    opacity: 0.5;
+    filter: brightness(0.55) sepia(0.2);
+    z-index: -2;
   }
   .final-cta::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, rgba(15,17,21,0.7) 0%, rgba(15,17,21,0.95) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.85) 100%);
     z-index: -1;
   }
-  .final-cta h2 { margin-bottom: 16px; }
-  .final-cta p { color: #c8cdd8; max-width: 540px; margin: 0 auto 32px; }
+  .final-cta h2 { color: #fff; margin-bottom: 16px; }
+  .final-cta p { color: rgba(255,255,255,0.85); max-width: 540px; margin: 0 auto 32px; }
 
   /* ============================================================
      АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ
@@ -502,6 +537,7 @@
     .quiz-nav { flex-direction: column; }
     .quiz-nav .btn-ghost { flex: 1; }
     .car { font-size: 24px; }
+    .road { height: 12px; }
   }
 </style>
 </head>
@@ -555,7 +591,6 @@
   <div class="container">
     <div class="quiz-card">
 
-      <!-- Прогресс-бар в виде дороги с машинкой -->
       <div class="road-wrap">
         <div class="road">
           <div class="road-fill" id="roadFill"></div>
@@ -564,7 +599,6 @@
       </div>
       <div class="progress-text" id="progressText">Вопрос 1 из 6</div>
 
-      <!-- Экран квиза -->
       <div id="quizScreen" class="screen active">
         <div class="question-title" id="questionTitle">Загрузка...</div>
         <div class="answers" id="answersBox"></div>
@@ -574,7 +608,6 @@
         </div>
       </div>
 
-      <!-- Экран результата -->
       <div id="resultScreen" class="screen">
         <span class="result-emoji" id="resultEmoji">🟢</span>
         <div class="result-title" id="resultTitle"></div>
@@ -628,7 +661,7 @@
 /* ============================================================
    ДАННЫЕ КВИЗА
    ============================================================ */
-const QUESTIONS = [
+var QUESTIONS = [
   {
     title: "Как ты сейчас ведёшь учёт расходов на авто?",
     answers: [
@@ -685,40 +718,42 @@ const QUESTIONS = [
   }
 ];
 
-let currentQuestion = 0;
-let answers = new Array(QUESTIONS.length).fill(null);
-let totalScore = 0;
-let monthlySpend = 5000;
+var currentQuestion = 0;
+var userAnswers = new Array(QUESTIONS.length).fill(null);
+var totalScore = 0;
+var monthlySpend = 5000;
 
 /* ============================================================
    РЕНДЕР ВОПРОСА
    ============================================================ */
 function renderQuestion() {
-  const q = QUESTIONS[currentQuestion];
+  var q = QUESTIONS[currentQuestion];
   document.getElementById('questionTitle').textContent = q.title;
 
-  const answersBox = document.getElementById('answersBox');
+  var answersBox = document.getElementById('answersBox');
   answersBox.innerHTML = '';
 
-  q.answers.forEach((ans, idx) => {
-    const btn = document.createElement('button');
-    btn.className = 'answer' + (answers[currentQuestion] === idx ? ' selected' : '');
-    btn.textContent = ans.text;
-    btn.onclick = () => selectAnswer(idx);
-    answersBox.appendChild(btn);
-  });
+  for (var i = 0; i < q.answers.length; i++) {
+    (function(idx) {
+      var ans = q.answers[idx];
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'answer' + (userAnswers[currentQuestion] === idx ? ' selected' : '');
+      btn.textContent = ans.text;
+      btn.onclick = function() { selectAnswer(idx); };
+      answersBox.appendChild(btn);
+    })(i);
+  }
 
-  // Прогресс: считаем по текущему шагу
-  const progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
+  var progress = ((currentQuestion + 1) / QUESTIONS.length) * 100;
   document.getElementById('roadFill').style.width = progress + '%';
-  // Машинка едет вместе с прогрессом
   document.getElementById('car').style.left = progress + '%';
   document.getElementById('progressText').textContent =
-    `Вопрос ${currentQuestion + 1} из ${QUESTIONS.length}`;
+    'Вопрос ' + (currentQuestion + 1) + ' из ' + QUESTIONS.length;
 
   document.getElementById('backBtn').style.display =
     currentQuestion === 0 ? 'none' : 'inline-block';
-  document.getElementById('nextBtn').disabled = answers[currentQuestion] === null;
+  document.getElementById('nextBtn').disabled = userAnswers[currentQuestion] === null;
   document.getElementById('nextBtn').textContent =
     currentQuestion === QUESTIONS.length - 1 ? 'Узнать результат →' : 'Далее →';
 }
@@ -727,7 +762,7 @@ function renderQuestion() {
    ВЫБОР ОТВЕТА
    ============================================================ */
 function selectAnswer(idx) {
-  answers[currentQuestion] = idx;
+  userAnswers[currentQuestion] = idx;
   recalcTotals();
   renderQuestion();
 }
@@ -735,7 +770,171 @@ function selectAnswer(idx) {
 function recalcTotals() {
   totalScore = 0;
   monthlySpend = 5000;
-  answers.forEach((ansIdx, qIdx) => {
-    if (ansIdx !== null) {
-      const ans = QUESTIONS[qIdx].answers[ansIdx];
-      totalScore += ans.score || 0
+  for (var qIdx = 0; qIdx < userAnswers.length; qIdx++) {
+    var ansIdx = userAnswers[qIdx];
+    if (ansIdx !== null && ansIdx !== undefined) {
+      var ans = QUESTIONS[qIdx].answers[ansIdx];
+      totalScore += ans.score || 0;
+      if (ans.monthly) monthlySpend = ans.monthly;
+    }
+  }
+}
+
+/* ============================================================
+   НАВИГАЦИЯ
+   ============================================================ */
+function nextQuestion() {
+  if (userAnswers[currentQuestion] === null) return;
+  if (currentQuestion < QUESTIONS.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function prevQuestion() {
+  if (currentQuestion > 0) {
+    currentQuestion--;
+    renderQuestion();
+  }
+}
+
+/* ============================================================
+   ПОКАЗ РЕЗУЛЬТАТА
+   ============================================================ */
+function showResult() {
+  document.getElementById('quizScreen').classList.remove('active');
+  document.getElementById('resultScreen').classList.add('active');
+
+  var annual = monthlySpend * 12;
+  var emoji, title, percentLow, percentHigh, text;
+
+  if (totalScore <= 6) {
+    emoji = '🟢';
+    title = 'Ты в порядке. Но есть куда расти';
+    percentLow = 5; percentHigh = 15;
+    text = 'Ты следишь за машиной лучше большинства. Но даже при аккуратном подходе теряется часть бюджета — на «на всякий случай» заменах и мелких работах.';
+  } else if (totalScore <= 12) {
+    emoji = '🟡';
+    title = 'Ты переплачиваешь. Но пока не критично';
+    percentLow = 20; percentHigh = 35;
+    text = 'Ты помнишь о машине, но не всегда контролируешь процесс. Самое обидное: половину этих денег можно было не тратить — причина в отсутствии системы.';
+  } else {
+    emoji = '🔴';
+    title = 'Стоп. Ты теряешь серьёзные деньги';
+    percentLow = 40; percentHigh = 60;
+    text = 'По твоим ответам — ты отдаёшь сервисам существенную часть бюджета сверх необходимого. Ты не обязан помнить всё. Но пока не помнишь — платишь больше, чем должен.';
+  }
+
+  var sumLow = Math.round(annual * percentLow / 100 / 1000) * 1000;
+  var sumHigh = Math.round(annual * percentHigh / 100 / 1000) * 1000;
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultSum').textContent =
+    '≈ ' + sumLow.toLocaleString('ru-RU') + ' – ' + sumHigh.toLocaleString('ru-RU') + ' ₽ в год';
+  document.getElementById('resultText').textContent = text;
+
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ============================================================
+   ОТПРАВКА ФОРМЫ В GOOGLE SHEETS
+   ⚠️ Когда будешь готова — замени URL на свой Apps Script.
+   Пока оставляем заглушку, чтобы форма не падала с ошибкой.
+   ============================================================ */
+var GOOGLE_SHEETS_URL = ''; // пусто = форма работает в демо-режиме
+
+function submitForm(e) {
+  e.preventDefault();
+  var btn = document.getElementById('submitBtn');
+  var status = document.getElementById('formStatus');
+
+  var name = document.getElementById('name').value.trim();
+  var phone = document.getElementById('phone').value.trim();
+
+  if (!name || !phone) {
+    status.textContent = 'Заполни имя и телефон';
+    status.className = 'form-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+  status.textContent = '';
+  status.className = 'form-status';
+
+  var payload = {
+    name: name,
+    phone: phone,
+    score: totalScore,
+    monthlySpend: monthlySpend,
+    date: new Date().toISOString()
+  };
+
+  // Демо-режим: пока URL не подключён, просто показываем успех
+  if (!GOOGLE_SHEETS_URL) {
+    setTimeout(function() {
+      status.textContent = '✓ Готово! (демо-режим — подключим таблицу позже)';
+      status.className = 'form-status ok';
+      btn.disabled = false;
+      btn.textContent = 'Получить доступ бесплатно →';
+      document.getElementById('leadForm').reset();
+    }, 600);
+    return;
+  }
+
+  fetch(GOOGLE_SHEETS_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(function() {
+    status.textContent = '✓ Готово! Скоро пришлём доступ к боту.';
+    status.className = 'form-status ok';
+    document.getElementById('leadForm').reset();
+  })
+  .catch(function(err) {
+    console.error(err);
+    status.textContent = 'Ошибка отправки. Попробуй ещё раз.';
+    status.className = 'form-status err';
+  })
+  .finally(function() {
+    btn.disabled = false;
+    btn.textContent = 'Получить доступ бесплатно →';
+  });
+}
+
+/* ============================================================
+   АНИМАЦИЯ ПОЯВЛЕНИЯ ПРИ СКРОЛЛЕ
+   ============================================================ */
+function initReveal() {
+  var els = document.querySelectorAll('.reveal');
+  if (!('IntersectionObserver' in window)) {
+    // Фолбэк для старых браузеров — просто показать всё
+    for (var i = 0; i < els.length; i++) els[i].classList.add('visible');
+    return;
+  }
+  var io = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  els.forEach(function(el) { io.observe(el); });
+}
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', function() {
+  renderQuestion();
+  initReveal();
+});
+</script>
+</body>
+</html>
